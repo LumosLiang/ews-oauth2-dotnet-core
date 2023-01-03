@@ -10,9 +10,9 @@ namespace EWS_OAuth2
         {
             // Using Microsoft.Identity.Client
             var cca = ConfidentialClientApplicationBuilder
-                .Create("f7142365-b662-44c9-afec-6f3105a20143")      //client Id
-                .WithClientSecret("z3g9fg-Y-15~imqr4GDQxC1M..55Zof0-~")
-                .WithTenantId("50291d04-103e-4a6a-b699-e78122e371f5")
+                .Create("513f26ae-dee9-48a1-ba0c-bc541d15cefd")      //appId
+                .WithClientSecret("b3F8Q~Ijl9f6stBHxRH2e5NA.agbdeqXgn4qaaYR") // client secrete: b3F8Q~Ijl9f6stBHxRH2e5NA.agbdeqXgn4qaaYR, client id: 41ff9c4c-f5b4-4495-98b8-ba690ce64755
+                .WithTenantId("f6ed3d45-259e-4bcb-b07c-976fc1e5ee08") // tenantId
                 .Build();
 
             var ewsScopes = new string[] { "https://outlook.office365.com/.default" };
@@ -20,28 +20,30 @@ namespace EWS_OAuth2
             try
             {
                 // Get token
-                var authResult = await cca.AcquireTokenForClient(ewsScopes)
-                    .ExecuteAsync();
+                var authResult = await cca.AcquireTokenForClient(ewsScopes).ExecuteAsync();
 
                 // Configure the ExchangeService with the access token
                 var ewsClient = new ExchangeService(ExchangeVersion.Exchange2016);
                 ewsClient.Url = new Uri("https://outlook.office365.com/EWS/Exchange.asmx");
                 ewsClient.Credentials = new OAuthCredentials(authResult.AccessToken);
+
+
+                // To use application permissions, you will also need to explicitly impersonate a mailbox that you would like to access.
                 ewsClient.ImpersonatedUserId =
-                    new ImpersonatedUserId(ConnectingIdType.SmtpAddress, "test@testdomain.onmicrosoft.com");
+                    new ImpersonatedUserId(ConnectingIdType.SmtpAddress, "yuanliang@yulian.onmicrosoft.com");
 
                 //Include x-anchormailbox header
-                ewsClient.HttpHeaders.Add("X-AnchorMailbox", "test@testdomain.onmicrosoft.com");
+                ewsClient.HttpHeaders.Add("X-AnchorMailbox", "yuanliang@yulian.onmicrosoft.com");
 
                 // Make an EWS call to list folders on exhange online
-                var folders = ewsClient.FindFolders(WellKnownFolderName.MsgFolderRoot, new FolderView(10));
+                var folders = ewsClient.FindFolders(WellKnownFolderName.MsgFolderRoot, new FolderView(50));
                 foreach (var folder in folders.Result)
                 {
                     Console.WriteLine($"Folder: {folder.DisplayName}");
                 }
 
                 // Make an EWS call to read 50 emails (last 5 days) from Inbox folder
-                TimeSpan ts = new TimeSpan(-5, 0, 0, 0);
+                TimeSpan ts = new TimeSpan(-360, 0, 0, 0);
                 DateTime date = DateTime.Now.Add(ts);
                 SearchFilter.IsGreaterThanOrEqualTo filter = new SearchFilter.IsGreaterThanOrEqualTo(ItemSchema.DateTimeReceived, date);
                 var findResults = ewsClient.FindItems(WellKnownFolderName.Inbox, filter, new ItemView(50));
