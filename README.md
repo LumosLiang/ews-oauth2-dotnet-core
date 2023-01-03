@@ -1,3 +1,5 @@
+Very similar to: https://learn.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-authenticate-an-ews-application-by-using-oauth#code-samples
+
 # Introduction 
 This is a dotnet core project to connect to Microsoft Exchange Online (Microsoft 365) using EWS (Exchange Web Services) with OAuth2 and read emails.
 Exchange Web Services (EWS) is a standard to enable client applications to communicate with the Exchange server. EWS provides access to much of the same data that is made available through Microsoft Office Outlook. SOAP provides the messaging framework for messages sent between the client application and the Exchange server. The SOAP messages are sent over HTTP.
